@@ -1,12 +1,11 @@
 #include <stdio.h>
-#include <math.h>
 
 int main(void) {
-    int somatorio = 0;
+    long long unsigned somatorio;
     for (int i = 0; i < 64; i++) {
-        somatorio += pow(2, i);
+        somatorio += (1ULL << i);
     }
 
-    printf("Numero de graus de trigo: %d\n", somatorio);
+    printf("Número de graus de trigo: %llu\n", somatorio);
     return 0;
 }
