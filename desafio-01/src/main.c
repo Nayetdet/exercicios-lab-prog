@@ -5,7 +5,7 @@
 
 unsigned char armarios = 0x00;
 
-bool armarioEstaCheio() {
+bool armariosEstaoCheios() {
     return armarios == 0xFF;
 }
 
@@ -18,7 +18,7 @@ unsigned char escolherArmario() {
 }
 
 void ocuparArmario() {
-    if (armarioEstaCheio()) {
+    if (armariosEstaoCheios()) {
         printf("Erro: Todos os armarios ja estao ocupados\n");
         return;
     }

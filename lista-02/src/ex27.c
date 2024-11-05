@@ -17,7 +17,7 @@ void obterMinMax(int* min, int* max) {
         if (valor > *max) {
             *max = valor;
         }
-    } while (valor >= 0 || valor % 2 != 0); 
+    } while (valor >= 0 || valor % 2); 
 }
 
 int main(void) {
