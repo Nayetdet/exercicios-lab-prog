@@ -10,16 +10,17 @@ int main(void) {
         return 1;
     }
 
-    for (signed char offset = 4; offset >= -4; offset--) {
-        if (!offset) {
+    int pos = 0;
+    for (int currentY = y + 4; currentY >= y - 4; currentY--) {
+        if (y == currentY) {
             continue;
         }
-
-        unsigned char mask = (x >> (offset + 4)) & 0x01;
-        unsigned char currentY = y + offset;
-        unsigned char result = (currentY & 0xFE) | mask;
-        printf("y%+d: %#x->%#x\n", offset, currentY, result);    
+        
+        unsigned char mask = 0x01 << pos;
+        unsigned char result = (x & mask) | (currentY & ~mask);
+        printf("y%+d: %#x->%#x\n", currentY - y, currentY, result);
+        pos++;
     }
-    
+
     return 0;
 }
