@@ -1,68 +1,53 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <time.h>
 
-unsigned char armarios = 0x00;
+#include "armarios.h"
 
-bool armariosEstaoCheios() {
-    return armarios == 0xFF;
-}
+typedef enum {
+    OCUPAR_ARMARIO = 1,
+    LIBERAR_ARMARIO = 2,
+    SAIR = 3
+} OpcaoMenu;
 
-unsigned char escolherArmario() {
-    unsigned char posicao;
-    do {
-        posicao = rand() % 8;
-    } while ((armarios >> posicao) & 0x01);
-    return posicao;
-}
-
-void ocuparArmario() {
-    if (armariosEstaoCheios()) {
-        printf("Erro: Todos os armarios ja estao ocupados\n");
-        return;
-    }
-
-    unsigned char posicao = escolherArmario();
-    armarios |= (1 << posicao);
-}
-
-void liberarArmario() {
-    unsigned char posicao;
-    printf("Insira a posicao do armario a ser desocupado: ");
-    scanf("%hhu", &posicao);
-
-    if (posicao < 0 || posicao > 7) {
-        printf("Erro: Posicao invalida\n");
-        return;
-    }
-
-    armarios &= ~(1 << posicao);
+void exibirMenu(void) {
+    puts("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
+    puts("|G|e|r|e|n|c|i|a|d|o|r| |d|e| |A|r|m|a|r|i|o|s|");
+    puts("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
+    puts("1. Ocupar armario");
+    puts("2. Liberar armario");
+    puts("3. Sair");
 }
 
 int main(void) {
-    srand(time(0));
+    srand(time(NULL));
 
-    printf("Menu de Gerenciamento de Armarios:\n");
-    printf("1. Ocupar armario\n");
-    printf("2. Liberar armario\n");
-    printf("3. Sair\n");
-
+    unsigned char armarios = 0x00;
     unsigned char opcao;
+
+    exibirMenu();
+
     do {
-        printf("Escolha uma opcao: ");
+        printf("\n>> Escolha uma opcao: ");
         scanf("%hhu", &opcao);
 
         switch (opcao) {
-            case 1:
-                ocuparArmario();
+            case OCUPAR_ARMARIO:
+                ocuparArmario(&armarios);
                 break;
-            case 2:
-                liberarArmario();
+            case LIBERAR_ARMARIO:
+                liberarArmario(&armarios);
+                break;
+            case SAIR:
+                puts("Saindo...");
+                continue;
+            default:
+                puts("Opcao invalida! Escolha entre 1, 2 e 3");
                 break;
         }
 
         printf("Estado atual dos armarios: %#x\n", armarios);
-    } while (opcao != 3);
+    } while (opcao != SAIR);
+
     return 0;
 }
