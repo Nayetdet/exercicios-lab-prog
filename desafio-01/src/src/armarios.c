@@ -12,30 +12,31 @@ bool armarioEstaOcupado(unsigned char* armarios, unsigned char posicao) {
     return (*armarios >> posicao) & 0x01;
 }
 
-unsigned char escolherArmario(unsigned char* armarios) {
-    unsigned char posicao;
+char escolherArmario(unsigned char* armarios) {
+    char posicao;
     do {
+        if (armariosEstaoCheios(armarios))
+            return -1;
         posicao = rand() % 8;
     } while (armarioEstaOcupado(armarios, posicao));
     return posicao;
 }
 
 void ocuparArmario(unsigned char* armarios) {
-    if (armariosEstaoCheios(armarios)) {
+    char posicao = escolherArmario(armarios);
+    if (posicao < 0) {
         puts("Erro: Todos os armarios ja estao ocupados");
         return;
     }
 
-    unsigned char posicao = escolherArmario(armarios);
     *armarios |= (1 << posicao);
-
-    printf("O armario de posicao %hhu foi ocupado\n", posicao);
+    printf("O armario de posicao %hhd foi ocupado\n", posicao);
 }
 
 void liberarArmario(unsigned char* armarios) {
-    unsigned char posicao;
+    char posicao;
     printf(">>>> Insira a posicao do armario a ser desocupado (0 a 7): ");
-    scanf("%hhu", &posicao);
+    scanf("%hhd", &posicao);
 
     if (posicao < 0 || posicao > 7) {
         puts("Erro: Posicao invalida");
@@ -48,4 +49,5 @@ void liberarArmario(unsigned char* armarios) {
     }
 
     *armarios &= ~(1 << posicao);
+    printf("O armario de posicao %hhd foi desocupado\n", posicao);
 }
