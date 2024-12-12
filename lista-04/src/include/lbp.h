@@ -9,7 +9,8 @@ typedef struct {
     unsigned char** pixels;
 } LBPImage;
 
-LBPImage* calculateLBPImage(PGMImage* pgm);
+LBPImage* getLBPImage(PGMImage* pgm);
+unsigned char getLBPPattern(PGMImage* pgm, int row, int column);
 void freeLBPImage(LBPImage* lbp);
 
 #endif

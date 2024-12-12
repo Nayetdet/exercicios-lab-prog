@@ -1,17 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "lbp.h"
 #include "pgm.h"
 
-LBPImage* calculateLBPImage(PGMImage* pgm) {
-    static int offsets[8][2] = {
-        {-1, -1}, {0, -1}, {1, -1},
-        {-1,  0},          {1,  0},
-        {-1,  1}, {0,  1}, {1,  1}
-    };
-
-    if (!pgm) {
+LBPImage* getLBPImage(PGMImage* pgm) {
+    if (!pgm || !pgm->pixels) {
+        fprintf(stderr, "Erro: Imagem de entrada invalida\n");
         return NULL;
     }
 
@@ -21,18 +17,15 @@ LBPImage* calculateLBPImage(PGMImage* pgm) {
         return NULL;
     }
 
-    lbp->width = pgm->width;
-    lbp->height = pgm->height;
-
-    lbp->pixels = (unsigned char**)malloc(lbp->height * sizeof(unsigned char*));
+    lbp->pixels = (unsigned char**)malloc(pgm->height * sizeof(unsigned char*));
     if (!lbp->pixels) {
         fprintf(stderr, "Erro: Falha ao alocar memoria para os pixeis da imagem LBP\n");
         freeLBPImage(lbp);
         return NULL;
     }
 
-    for (int i = 0; i < lbp->height; i++) {
-        lbp->pixels[i] = (unsigned char*)malloc(lbp->width * sizeof(unsigned char));
+    for (int i = 0; i < pgm->height; i++) {
+        lbp->pixels[i] = (unsigned char*)malloc(pgm->width * sizeof(unsigned char));
         if (!lbp->pixels[i]) {
             fprintf(stderr, "Erro: Falha ao alocar memoria para a linha %d da imagem LBP\n", i);
             freeLBPImage(lbp);
@@ -40,22 +33,40 @@ LBPImage* calculateLBPImage(PGMImage* pgm) {
         }
     }
 
-    for (int i = 1; i < pgm->height - 1; i++) {
-        for (int j = 1; j < pgm->width - 1; j++) {
-            unsigned char center = pgm->pixels[i][j];
-            unsigned char bin = 0x00;
+    lbp->width = pgm->width;
+    lbp->height = pgm->height;
 
-            for (int k = 0; k < 8; k++) {
-                if (pgm->pixels[i + offsets[k][0]][j + offsets[k][1]] >= center) {
-                    bin |= (1 << (7 - k));
-                }
-            }
-
-            lbp->pixels[i][j] = bin;
+    for (int i = 0; i < pgm->height; i++) {
+        for (int j = 0; j < pgm->width; j++) {
+            lbp->pixels[i][j] = getLBPPattern(pgm, i, j);
         }
     }
 
     return lbp;
+}
+
+unsigned char getLBPPattern(PGMImage* pgm, int row, int column) {
+    static const int offsets[8][2] = {
+        {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}
+    };
+
+    unsigned char center = pgm->pixels[row][column];
+    unsigned char pattern = 0x00;
+
+    for (int i = 0; i < 8; i++) {
+        int neighborRow = row + offsets[i][0];
+        int neighborColumn = column + offsets[i][1];
+
+        if (!isPositionWithinPGMImageBounds(pgm, neighborRow, neighborColumn)) {
+            continue;
+        }
+
+        if (pgm->pixels[neighborRow][neighborColumn] >= center) {
+            pattern |= 0x01 << i;
+        }
+    }
+    
+    return pattern;
 }
 
 void freeLBPImage(LBPImage* lbp) {

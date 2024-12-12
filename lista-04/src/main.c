@@ -4,12 +4,12 @@
 #include "pgm.h"
 
 int main(void) {
-    PGMImage* pgm = readPGMImage("assets/cat.pgm");
+    PGMImage* pgm = getPGMImage("assets/cat.pgm");
     if (!pgm) {
         return 1;
     }
 
-    LBPImage* lbp = calculateLBPImage(pgm);
+    LBPImage* lbp = getLBPImage(pgm);
     if (!lbp) {
         return 1;
     }
@@ -28,5 +28,6 @@ int main(void) {
 
     freePGMImage(pgm);
     freeLBPImage(lbp);
+    
     return 0;
 }

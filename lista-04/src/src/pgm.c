@@ -1,10 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "pgm.h"
 
-PGMImage* readPGMImage(const char* path) {
+static void cleanupOnError(FILE* fp, PGMImage* pgm) {
+    if (fp) {
+        fclose(fp);
+    }
+
+    freePGMImage(pgm);
+}
+
+PGMImage* getPGMImage(const char* path) {
     FILE* fp = fopen(path, "rb");
     if (!fp) {
         fprintf(stderr, "Erro: Nao foi possivel abrir o arquivo\n");
@@ -31,13 +40,15 @@ PGMImage* readPGMImage(const char* path) {
     }
 
     ungetc(ch, fp);
+
     if (fscanf(fp, "%d %d %d", &pgm->width, &pgm->height, &pgm->maxPixel) != 3) {
         fprintf(stderr, "Erro: Falha ao ler as dimensoes ou o valor maximo de pixel da imagem PGM\n");
         cleanupOnError(fp, pgm);
         return NULL;
     }
-
+    
     fgetc(fp);
+
     if (pgm->width <= 0 || pgm->height <= 0 || pgm->maxPixel <= 0 || pgm->maxPixel >= 256) {
         fprintf(stderr, "Erro: Valores invalidos para largura, altura ou valor maximo de pixel da imagem PGM\n");
         cleanupOnError(fp, pgm);
@@ -70,12 +81,12 @@ PGMImage* readPGMImage(const char* path) {
     return pgm;
 }
 
-void cleanupOnError(FILE* fp, PGMImage* pgm) {
-    if (fp) {
-        fclose(fp);  
-    };
-
-    freePGMImage(pgm);
+bool isPositionWithinPGMImageBounds(PGMImage* pgm, int row, int column) {
+    if (!pgm) {
+        return false;
+    }
+    
+    return row >= 0 && column >= 0 && row < pgm->height && column < pgm->width;
 }
 
 void freePGMImage(PGMImage* pgm) {

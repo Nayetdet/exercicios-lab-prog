@@ -1,6 +1,8 @@
 #ifndef PGM_H
 #define PGM_H
 
+#include <stdbool.h>
+
 typedef struct {
     int width;
     int height;
@@ -8,8 +10,8 @@ typedef struct {
     unsigned char** pixels;
 } PGMImage;
 
-PGMImage* readPGMImage(const char* path);
+PGMImage* getPGMImage(const char* path);
+bool isPositionWithinPGMImageBounds(PGMImage* pgm, int row, int column);
 void freePGMImage(PGMImage* pgm);
-void cleanupOnError(FILE* fp, PGMImage* pgm);
 
 #endif
